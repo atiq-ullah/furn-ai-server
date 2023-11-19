@@ -1,0 +1,7 @@
+[MESSAGES CONTROL]
+disable=
+    C0116, # Function docstring
+    C0115, # Class docstring
+    C0114 # Missing module docstring
+[MASTER]
+load-plugins=pylint_django
