@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from .helpers import (
     PromptType,
     validate_prompt_request,
@@ -8,8 +8,6 @@ from .helpers import (
     PARSING_THREAD_ID,
     CAT_THREAD_ID
 )
-
-
 
 def list_messages(request):
     asst_type = request.query_params.get("assistant", "")
@@ -21,12 +19,10 @@ def list_messages(request):
         ).json()
 
     elif asst_type == PromptType.CAT.value:
-        message_list = client.beta.threads.messages.list(thread_id=CAT_THREAD_ID).json()
+        message_list = client.beta.threads.messages.list(
+            thread_id=CAT_THREAD_ID).json()
 
-    return HttpResponse(
-        message_list,
-        content_type="application/json",
-    )
+    return JsonResponse({"message": message_list})
 
 def send_prompt(request):
     validation_result = validate_prompt_request(request)
@@ -57,6 +53,6 @@ def get_run_status(request):
 
     if run.status == "completed":
         messages = client.beta.threads.messages.list(thread_id=thread_id).json()
-        return HttpResponse(messages, content_type="application/json")
+        return JsonResponse({ "messages": messages })
 
-    return HttpResponse(status=run.status, content_type="application/json")
+    return JsonResponse({"status": run.status})
