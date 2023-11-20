@@ -3,6 +3,6 @@
 **/.env
 **/migrations/
 
-manage.py
+# manage.py
 db.sqlite3
 env/
