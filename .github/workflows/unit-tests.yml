@@ -10,7 +10,13 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+      OPENAI_PARSING_ASST_ID: ${{ secrets.OPENAI_PARSING_ASST_ID }}
+      OPENAI_CATEGORIZING_ASST_ID: ${{ secrets.OPENAI_CATEGORIZING_ASST_ID }}
+      OPENAI_PARSING_THREAD_ID: ${{ secrets.OPENAI_PARSING_THREAD_ID }}
+      OPENAI_CATEGORIZING_THREAD_ID: ${{ secrets.OPENAI_CATEGORIZING_THREAD_ID }}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.12
