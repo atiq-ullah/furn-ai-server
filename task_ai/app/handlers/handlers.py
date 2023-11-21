@@ -12,8 +12,6 @@ from .helpers import (
 )
 from . import celery
 
-
-# from task_ai.app.tasks import check_run_status
 def list_messages(request):
     asst_type = request.GET.get("assistant", "")
     message_list = []
@@ -28,7 +26,11 @@ def list_messages(request):
             thread_id=CAT_THREAD_ID).json()
 
     return JsonResponse({"message": message_list})
-
+def send_run_creation(p_type, prompt):
+    run = handle_run_creation(p_type, prompt)
+    periodically_check_run_status.delay(p_type, run.id)
+    return run.id
+    
 def send_prompt(request):
     validation_result = validate_prompt_request(request)
 
@@ -36,16 +38,13 @@ def send_prompt(request):
 
     if validation_result:
         return validation_result
-
-    run = handle_run_creation(p_type, prompt)
-    celery_get_run_status.delay(p_type, run.id)
     
+    run_id = send_run_creation(p_type, prompt)
 
 
-    return JsonResponse(data={"run_id": run.id})
+    
+    return JsonResponse(data={"run_id": run_id})
 
-
-# TODO: Make this a Celery task that calls a webhook once the run is done
 def get_run_status(request):
     thread_id = ""
 
@@ -65,36 +64,27 @@ def get_run_status(request):
 
     return JsonResponse({"status": run.status})
 
+
 @celery.task(soft_time_limit=30)
-def celery_get_run_status(p_type, run_id):
+def periodically_check_run_status(p_type, run_id):
     thread_id = ""
 
     if p_type == PromptType.PARSE.value:
         thread_id = PARSING_THREAD_ID
     elif p_type == PromptType.CAT.value:
         thread_id = CAT_THREAD_ID
-    
-    run = client.beta.threads.runs.retrieve(run_id, thread_id=thread_id)
-    if run.status == "completed":
-        messages = client.beta.threads.messages.list(thread_id=thread_id).json()
-        return messages
 
-    print("run status: ", run.status)
+  
+        while True:
+            try:
+                time.sleep(5)
+                run = client.beta.threads.runs.retrieve(run_id, thread_id=thread_id)   
 
-    while True:
-        run = client.beta.threads.runs.retrieve(run_id, thread_id=thread_id)   
-        print("run status: ", run.status)
- 
-        time.sleep(1)
+                if run.status == "completed":
+                    messages = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0]
+                    print(messages.text.value)
+                    return run.status
 
-        if run.status == "completed":
-            messages = client.beta.threads.messages.list(thread_id=thread_id).json()
-            # Feed the result into another prompt call
-            # Re-use the send_prompt and this task
-            # Need to handle if the type is cat and it has completed since that means
-            # We need to send the result to the Django channel for the client
-            print("message", messages)
-            return run.status
 
-    print("run status: ", run.status)
-    return run.status
+            except Exception as e:
+                print(f'An error occurred: {e}')
