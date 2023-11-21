@@ -74,17 +74,18 @@ def periodically_check_run_status(p_type, run_id):
     elif p_type == PromptType.CAT.value:
         thread_id = CAT_THREAD_ID
 
-  
-        while True:
-            try:
-                time.sleep(5)
-                run = client.beta.threads.runs.retrieve(run_id, thread_id=thread_id)   
+    while True:
+        try:
+            time.sleep(5)
+            run = client.beta.threads.runs.retrieve(run_id, thread_id=thread_id)   
 
-                if run.status == "completed":
-                    messages = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0]
-                    print(messages.text.value)
-                    return run.status
+            if run.status == "completed":
+                last_message = client.beta.threads.messages.list(thread_id=thread_id).data[0].content[0]
+                print(last_message.text.value)
+                break
+            else:
+                print(f'Run status: {run.status}')
 
 
-            except Exception as e:
-                print(f'An error occurred: {e}')
+        except Exception as e:
+            print(f'An error occurred: {e}')
