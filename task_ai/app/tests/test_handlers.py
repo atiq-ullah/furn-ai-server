@@ -1,17 +1,12 @@
-from django.http import JsonResponse
 import json
 from unittest import mock
-from django.test import TestCase, RequestFactory
 from unittest.mock import MagicMock
-import json
+from django.test import TestCase, RequestFactory
 
 from task_ai.app.handlers.handlers import (
     list_messages,
     send_prompt,
     get_run_status,
-    PromptType,
-    PARSING_THREAD_ID,
-    CAT_THREAD_ID,
 )
 
 class HandlersTest(TestCase):
@@ -42,7 +37,8 @@ class HandlersTest(TestCase):
         mock_validate_request.return_value = None
         mock_handle_run.return_value = mock.Mock(id='run_id')
 
-        request = self.factory.post('/prompt/', '{"prompt": "test prompt", "p_type": "parse"}', content_type='application/json')
+        request = self.factory.post('/prompt/',
+            '{"prompt": "test prompt", "p_type": "parse"}', content_type='application/json')
         response = send_prompt(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content), {'run_id': 'run_id'})
@@ -59,7 +55,7 @@ class HandlersTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), json.dumps({'messages': []}))
 
-        request = self.factory.get('/run_status/?run_id=run_id&type=cat')        
+        request = self.factory.get('/run_status/?run_id=run_id&type=cat')
         response = get_run_status(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode(), json.dumps({'messages': []}))

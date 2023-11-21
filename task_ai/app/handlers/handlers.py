@@ -42,7 +42,7 @@ def get_run_status(request):
     thread_id = ""
 
     run_id = request.GET.get("run_id", "")
-    p_type = request.GET.get("type", "")
+    p_type = request.GET.get("p_type", "")
 
     if p_type == PromptType.PARSE.value:
         thread_id = PARSING_THREAD_ID
