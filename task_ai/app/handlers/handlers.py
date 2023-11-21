@@ -10,7 +10,7 @@ from .helpers import (
 )
 
 def list_messages(request):
-    asst_type = request.query_params.get("assistant", "")
+    asst_type = request.GET.get("assistant", "")
     message_list = []
 
     if asst_type == PromptType.PARSE.value:
@@ -41,8 +41,8 @@ def send_prompt(request):
 def get_run_status(request):
     thread_id = ""
 
-    run_id = request.query_params.get("run_id", "")
-    p_type = request.query_params.get("type", "")
+    run_id = request.GET.get("run_id", "")
+    p_type = request.GET.get("type", "")
 
     if p_type == PromptType.PARSE.value:
         thread_id = PARSING_THREAD_ID
