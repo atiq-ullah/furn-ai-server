@@ -1,7 +1,41 @@
+# [MESSAGES CONTROL]
+# disable=
+#     C0116, # Function docstring
+#     C0115, # Class docstring
+#     C0114 # Missing module docstring
+#     W0511 #fixme
+[MASTER]
+ignore=CVS,migrations
+load-plugins=pylint_django
+
+[pylint_django]
+django-settings-module=task_ai.settings
+
 [MESSAGES CONTROL]
 disable=
-    C0116, # Function docstring
-    C0115, # Class docstring
-    C0114 # Missing module docstring
-[MASTER]
-load-plugins=pylint_django
+    missing-docstring,
+    invalid-name,
+    line-too-long,
+    too-many-locals,
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-instance-attributes,
+    no-self-use,
+    no-member,
+    fixme
+
+[FORMAT]
+max-line-length=120
+
+[DESIGN]
+# Maximum number of parents for a class (see R0901).
+max-parents=15
+
+[TYPECHECK]
+# List of members which are set dynamically and missed by Pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+generated-members=objects,DoesNotExist,MultipleObjectsReturned
+
+[LOGGING]
+logging-modules=logging

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def post_prompt_handler(request):
     form = PromptForm(request.POST)
-    logger.info("Form: ", form)
+    logger.info("Form: %s", form)
     validation = validate_request(form)
     logger.info(validation)
 
@@ -33,8 +33,8 @@ def post_prompt_handler(request):
     prompt = form.cleaned_data["prompt"]
     p_type = form.cleaned_data["p_type"]
 
-    logger.info(f"Prompt: {prompt}")
-    logger.info(f"Prompt type: {p_type}")
+    logger.info("Prompt: %s", prompt)
+    logger.info("Prompt type: %s", p_type)
     run_id = send_run_creation(p_type, prompt)
     periodically_check_run_status.delay(p_type, run_id)
 
@@ -76,5 +76,5 @@ def periodically_check_run_status(p_type, run_id):
                 break
             else:
                 print(f"Run status: {run.status}")
-        except Exception as e:
-            logger.error(f"An error occurred: {e}")
+        except Exception as e: # pylint: disable=broad-except
+            logger.error("An error occurred: %s", e)

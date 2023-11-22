@@ -1,10 +1,9 @@
+import logging
 from enum import Enum
-import json
 import os
 from django.http import JsonResponse
 from django import forms
 from openai import OpenAI
-import logging
 from dotenv import load_dotenv
 
 load_dotenv()
