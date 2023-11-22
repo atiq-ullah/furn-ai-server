@@ -16,7 +16,6 @@ from .helpers import (
 load_dotenv()
 
 
-
 celery = Celery("handlers", broker="pyamqp://", backend="rpc://")
 
 logger = logging.getLogger(__name__)
