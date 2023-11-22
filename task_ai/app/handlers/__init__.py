@@ -1,25 +1,28 @@
 import time
 import logging
 from django.http import JsonResponse
-from celery import Celery
 from dotenv import load_dotenv
+from celery import Celery
+from django.http import HttpRequest
+
 from .helpers import (
     PromptForm,
+    MessageForm,
     validate_request,
     promptTypeMap,
-    MessageForm,
-    send_run_creation,
     client,
+    handle_run_creation
 )
 
 load_dotenv()
 
-celery = Celery("handlers", broker="pyamqp://", backend="rpc://")
+app = Celery("handlers", broker="pyamqp://", backend="rpc://")
 
 logger = logging.getLogger(__name__)
 
 
-def post_prompt_handler(request):
+
+def post_prompt_handler(request: HttpRequest):
     form = PromptForm(request.POST)
     logger.info("Form: %s", form)
     validation = validate_request(form)
@@ -33,43 +36,50 @@ def post_prompt_handler(request):
 
     logger.info("Prompt: %s", prompt)
     logger.info("Prompt type: %s", p_type)
-    run_id = send_run_creation(p_type, prompt)
+    run_id = handle_run_creation(p_type, prompt)
     periodically_check_run_status.delay(p_type, run_id)
 
     return JsonResponse(data={"run_id": run_id})
 
-
-def get_prompt_handler(request):
+def get_prompt_handler(request: HttpRequest):
     form = MessageForm(request.GET)
+    logger.info("Form: %s", form)
+    validation = validate_request(form)
+    logger.info(validation)
 
-    if validate_request(form):
-        return validate_request(request)
-
+    if validation:
+        return validation
+    
     p_type = form.cleaned_data["p_type"]
 
+    if p_type not in promptTypeMap:
+        return JsonResponse(
+            data={"error": f"Prompt type {p_type} is not supported"}, status=400
+        )
+
     message_list = client.beta.threads.messages.list(
-        thread_id=promptTypeMap[p_type]
-    ).json()
+        thread_id=promptTypeMap[p_type] # type: ignore
+    ).json() # type: ignore
 
     return JsonResponse(data={"messages": message_list})
 
 
-@celery.task(soft_time_limit=30)
-def periodically_check_run_status(p_type, run_id):
+@app.task(soft_time_limit=30) #type: ignore
+def periodically_check_run_status(p_type: str, run_id: str):
     while True:
         try:
             time.sleep(5)
             run = client.beta.threads.runs.retrieve(
-                run_id, thread_id=promptTypeMap[p_type]
+                run_id, thread_id=promptTypeMap[p_type] # type: ignore
             )
 
             if run.status == "completed":
                 last_message = (
-                    client.beta.threads.messages.list(thread_id=promptTypeMap[p_type])
+                    client.beta.threads.messages.list(thread_id=promptTypeMap[p_type]) #type: ignore
                     .data[0]
                     .content[0]
                 )
-                print(last_message.text.value)
+                print(last_message.text.value) #type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
             else:
