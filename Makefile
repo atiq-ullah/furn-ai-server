@@ -1,35 +1,26 @@
-# The manage.py command
 MANAGE_PY=python manage.py
 CELERY_MODULE=task_ai.app.handlers
 
-
-# Default target: start the development server
 .PHONY: install
 install:
 	pip install -r requirements.txt
 
-
-# Default target: start the development server
 .PHONY: run
 run:
 	$(MANAGE_PY) runserver
 
-# Target for making database migrations
 .PHONY: migrations
 migrations:
 	$(MANAGE_PY) makemigrations
 
-# Target for applying database migrations
 .PHONY: migrate
 migrate:
 	$(MANAGE_PY) migrate
 
-# Target for running tests
 .PHONY: test
 test:
 	$(MANAGE_PY) test
 
-# Target for starting a Django shell
 .PHONY: shell
 shell:
 	$(MANAGE_PY) shell
