@@ -24,7 +24,6 @@ urlpatterns = [
     path("", include(router.urls)),
     path("admin", admin.site.urls),
     path("prompt", views.PromptView.as_view(), name="prompt"),
-    path("status", views.get_status, name="status"),
 
     # Swagger
     re_path(

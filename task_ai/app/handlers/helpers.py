@@ -2,16 +2,8 @@ from enum import Enum
 import json
 import os
 from django.http import JsonResponse
-from dotenv import load_dotenv
+from django import forms
 from openai import OpenAI
-
-load_dotenv()
-
-
-class PromptType(Enum):
-    PARSE = "parse"
-    CAT = "cat"
-
 
 PARSING_ASST_ID = os.environ.get("OPENAI_PARSING_ASST_ID")
 PARSING_THREAD_ID = os.environ.get("OPENAI_PARSING_THREAD_ID")
@@ -20,39 +12,45 @@ CAT_ASST_ID = os.environ.get("OPENAI_CATEGORIZING_ASST_ID")
 CAT_THREAD_ID = os.environ.get("OPENAI_CATEGORIZING_THREAD_ID")
 MODEL = os.environ.get("OPENAI_MODEL")
 
+class PromptForm(forms.Form):
+    prompt = forms.CharField(required=True)
+    p_type = forms.ChoiceField(choices=[(tag, tag.value) for tag in PromptType])
+
+class MessageForm(forms.Form):
+    run_id = forms.CharField(required=True)
+    p_type = forms.ChoiceField(choices=[(tag, tag.value) for tag in PromptType])
+
+promptTypeMap = {
+    "parse": PARSING_THREAD_ID,
+    "cat": CAT_THREAD_ID
+}
+
+asstTypeMap = {
+    "parse": PARSING_ASST_ID,
+    "cat": CAT_ASST_ID
+}
+
+class PromptType(Enum):
+    PARSE = "parse"
+    CAT = "cat"
+
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
+def validate_request(form):
+    if form.is_valid():
+        return None
+    else:
+        return JsonResponse(form.errors, status=400)
 
-def extract_prompt_request_data(request):
-    data = json.loads(request.body)
-
-    prompt = data.get("prompt", "")
-    p_type = data.get("p_type", PromptType.PARSE.value)
-    return prompt, p_type
-
-
-def validate_prompt_request(request):
-    method = request.method
-    prompt, p_type = extract_prompt_request_data(request)
-    if method != "POST":
-        return JsonResponse({"error": "Invalid request method"}, status=400)
-    if prompt == "":
-        return JsonResponse({"error": "Prompt cannot be empty"}, status=400)
-    if p_type not in [PromptType.PARSE.value, PromptType.CAT.value]:
-        return JsonResponse({"error": "Invalid prompt type"}, status=400)
-
-    return None
+def send_run_creation(p_type, prompt):
+    run = handle_run_creation(p_type, prompt)
+    return run.id
 
 def handle_run_creation(p_type, prompt):
-    if p_type == PromptType.PARSE.value:
-        return create_run(PARSING_ASST_ID, PARSING_THREAD_ID, prompt)
-    elif p_type == PromptType.CAT.value:
-        return create_run(CAT_ASST_ID, CAT_THREAD_ID, prompt)
-
-def create_run(assistant_id, thread_id, prompt):
     client.beta.threads.messages.create(
-        thread_id=thread_id, role="user", content=prompt
+        thread_id=promptTypeMap[p_type], role="user", content=prompt
     )
+    
     return client.beta.threads.runs.create(
-        thread_id=thread_id, assistant_id=assistant_id
+        thread_id=promptTypeMap[p_type], assistant_id=asstTypeMap[p_type]
     )
