@@ -1,31 +1,21 @@
-from dotenv import load_dotenv
-
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
-
 from rest_framework import permissions, viewsets
-
 from task_ai.app.handlers.handlers import (
     send_prompt,
     list_messages,
     get_run_status
 )
-
 from task_ai.app.models import (
     Task,
     Instruction,
     CustomUser as User,
 )
-
 from task_ai.app.serializers import (
     UserSerializer,
     TaskSerializer,
     InstructionSerializer
 )
-
-
-load_dotenv()
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("-date_joined")
@@ -48,10 +38,10 @@ class PromptView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        return send_prompt(request)
+        return post_prompt_handler(request)
 
     def get(self, request):
-        return list_messages(request)
+        return get_prompt_handler(request)
 
 @api_view(["GET"])
 def get_status(request):
