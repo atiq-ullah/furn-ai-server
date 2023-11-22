@@ -12,9 +12,7 @@ from .helpers import (
     client,
 )
 
-
 load_dotenv()
-
 
 celery = Celery("handlers", broker="pyamqp://", backend="rpc://")
 
@@ -76,5 +74,5 @@ def periodically_check_run_status(p_type, run_id):
                 break
             else:
                 print(f"Run status: {run.status}")
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             logger.error("An error occurred: %s", e)
