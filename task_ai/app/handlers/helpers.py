@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from django import forms
 from openai import OpenAI
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 PARSING_ASST_ID = os.environ.get("OPENAI_PARSING_ASST_ID")
 PARSING_THREAD_ID = os.environ.get("OPENAI_PARSING_THREAD_ID")
@@ -24,15 +27,22 @@ class PromptType(Enum):
     PARSE = "parse"
     CAT = "cat"
 
+
 logger = logging.getLogger(__name__)
+
+
 class PromptForm(forms.Form):
     prompt = forms.CharField(required=True)
-    p_type = forms.ChoiceField(choices=[("parse", "Parse"), ("cat", "Cat")], required=True)
+    p_type = forms.ChoiceField(
+        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
+    )
 
 
 class MessageForm(forms.Form):
     run_id = forms.CharField(required=True)
-    p_type = forms.ChoiceField(choices=[("parse", "Parse"), ("cat", "Cat")], required=True)
+    p_type = forms.ChoiceField(
+        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
+    )
 
 
 client = OpenAI(api_key=API_KEY)
