@@ -24,14 +24,12 @@ urlpatterns = [
     path("", include(router.urls)),
     path("admin", admin.site.urls),
     path("prompt", views.PromptView.as_view(), name="prompt"),
-
     # Swagger
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         SchemaView.without_ui(cache_timeout=0),
         name="schema-json",
     ),
-
     path(
         "swagger/",
         SchemaView.with_ui("swagger", cache_timeout=0),
