@@ -17,9 +17,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HyperlinkedRelatedField(
-        view_name="user-detail", read_only=True
-    )
+    user = serializers.HyperlinkedRelatedField(view_name="user-detail", read_only=True)
 
     class Meta:
         model = Task

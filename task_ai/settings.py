@@ -21,31 +21,26 @@ REST_FRAMEWORK = {
 }
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": True,
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
         },
-        "django.file": {
-            "handlers": ["file"],
-            "level": "DEBUG",
-            "propagate": True,
+        '': {  # root logger
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
     },
 }
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -57,7 +52,7 @@ SECRET_KEY = "django-insecure-nh@+rk!cf-vr=*q%ftln*i2dhqcjk4(a(w#kn$unv7p+ajm339
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0']
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 
 
 # Application definition
