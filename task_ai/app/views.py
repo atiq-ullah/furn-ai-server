@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework import permissions, viewsets
-from task_ai.app.handlers.handlers import (
+from task_ai.app.handlers import (
     post_prompt_handler,
     get_prompt_handler,
 )
