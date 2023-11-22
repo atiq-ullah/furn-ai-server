@@ -11,6 +11,7 @@ load-plugins=pylint_django
 [pylint_django]
 django-settings-module=task_ai.settings
 
+
 [MESSAGES CONTROL]
 disable=
     missing-docstring,
@@ -20,7 +21,6 @@ disable=
     too-few-public-methods,
     too-many-arguments,
     too-many-instance-attributes,
-    no-self-use,
     no-member,
     fixme
 
