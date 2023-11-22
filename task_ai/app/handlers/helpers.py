@@ -1,10 +1,12 @@
 import logging
 from enum import Enum
 import os
-from django.http import JsonResponse
 from django import forms
-from openai import OpenAI
+from django.http import JsonResponse
 from dotenv import load_dotenv
+from openai import OpenAI
+from typing import Optional
+
 
 load_dotenv()
 
@@ -38,32 +40,32 @@ class PromptForm(forms.Form):
 
 
 class MessageForm(forms.Form):
-    run_id = forms.CharField(required=True)
     p_type = forms.ChoiceField(
         choices=[("parse", "Parse"), ("cat", "Cat")], required=True
     )
 
-
 client = OpenAI(api_key=API_KEY)
 
 
-def validate_request(form):
+def validate_request(form: forms.Form) -> Optional[JsonResponse]:
     if form.is_valid():
         return None
     else:
         return JsonResponse(form.errors, status=400)
 
 
-def send_run_creation(p_type, prompt):
-    run = handle_run_creation(p_type, prompt)
-    return run.id
+def handle_run_creation(p_type: str, prompt: str) -> str:
+    thread_id = promptTypeMap.get(p_type)
+    assistant_id = asstTypeMap.get(p_type)
+    if thread_id is None or assistant_id is None:
+        raise ValueError(f"Invalid prompt type: {p_type}")
 
-
-def handle_run_creation(p_type, prompt):
     client.beta.threads.messages.create(
-        thread_id=promptTypeMap[p_type], role="user", content=prompt
+        thread_id=thread_id, role="user", content=prompt
     )
 
-    return client.beta.threads.runs.create(
-        thread_id=promptTypeMap[p_type], assistant_id=asstTypeMap[p_type]
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id, assistant_id=assistant_id
     )
+
+    return run.id

@@ -1,3 +1,4 @@
+from django.http import HttpRequest
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework import permissions, viewsets
@@ -40,10 +41,11 @@ class InstructionViewSet(viewsets.ModelViewSet):
 class PromptView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request: HttpRequest):
         return post_prompt_handler(request)
 
-    def get(self, request):
+    def get(self, request: HttpRequest):
+
         return get_prompt_handler(request)
 
 
