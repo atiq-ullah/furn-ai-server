@@ -1,4 +1,4 @@
-### Task AI Overview
+# Task AI Overview
 
 Task AI is an innovative, AI-powered task manager designed to streamline task management and improve productivity. Leveraging advanced technologies like natural language processing and machine learning, Task AI transforms the way users interact with their tasks. From processing diverse input types to offering dynamic categorization and seamless integration with popular task management tools, Task AI adapts to user needs. The system continuously evolves, learning from user feedback to enhance its accuracy and relevance, making task management more intuitive and efficient.
 
