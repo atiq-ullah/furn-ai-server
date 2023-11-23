@@ -1,33 +1,87 @@
+from django import forms
 from django.test import TestCase, RequestFactory
+from django.http import JsonResponse
+
+import requests
+from urllib.parse import urlencode
 
 from task_ai.app.handlers.helpers import (
     validate_request,
     PromptForm,
 )
 
+class InputForm(forms.Form):
+    prompt = forms.CharField(required=False)
+    p_type = forms.CharField(required=False)
 
+
+
+# Create a form instance with the data
+# form = MyForm(data)
 class HelpersTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-    def test_validate_request_post_valid(self):
-        request = self.factory.post(
-            "/prompt",
-            '{"prompt": "test prompt", "p_type": "parse"}',
-            content_type="application/json",
-        )
-        form = PromptForm(request.POST)
-        result = validate_request(form)
+
+    def test_validate_request_valid(self):
+        encoded_data = PromptForm({
+            'p_type': 'parse',
+            'prompt': 'this is a valid test prompt',
+        })
+        result = validate_request(encoded_data)
         self.assertEqual(result, None)
 
-    def test_validate_request_post_invalid(self):
-        pass
+    def test_validate_request_missing_prompt(self):
+        encoded_data = PromptForm({
+            'p_type': 'parse',
+        })
+        result = validate_request(encoded_data)
+        json = JsonResponse({'prompt': ['This field is required.']}, status=400)
+        self.assertEqual(result.content, json.content)
 
-    def test_validate_request_get_valid(self):
-        pass
 
-    def test_validate_request_get_invalid(self):
-        pass
+    def test_validate_request_missing_p_type(self):
+        encoded_data = PromptForm({
+            'prompt': 'this is a valid test prompt',
+        })
+        result = validate_request(encoded_data)
+        json = JsonResponse({'p_type': ['This field is required.']}, status=400)
+        self.assertEqual(result.content, json.content)
 
+    def test_validate_request_unknown_p_type(self):
+        encoded_data = PromptForm({
+            'prompt': 'this is a valid test prompt',
+            'p_type': 'unknown',
+        })
+        result = validate_request(encoded_data)
+        json = JsonResponse({"p_type": ["Select a valid choice. unknown is not one of the available choices."]}, status=400)
+        self.assertEqual(result.content, json.content)
+
+    def test_validate_request_empty_prompt(self):
+        encoded_data = PromptForm({
+            'prompt': '',
+            'p_type': 'parse',
+        })
+        result = validate_request(encoded_data)
+        json = JsonResponse({'prompt': ['This field is required.']}, status=400)
+        self.assertEqual(result.content, json.content)
+
+    def test_validate_request_empty_p_type(self):
+        encoded_data = PromptForm({
+            'prompt': 'this is a valid test prompt',
+            'p_type': '',
+        })
+        result = validate_request(encoded_data)
+        json = JsonResponse({"p_type": ["This field is required."]}, status=400)
+        self.assertEqual(result.content, json.content)
+
+    def test_validate_request_empty_parameters(self):
+        encoded_data = PromptForm({})
+        result = validate_request(encoded_data)
+        json = JsonResponse({"prompt": ["This field is required."], "p_type": ["This field is required."]}, status=400)
+        self.assertEqual(result.content, json.content)
+
+    # @mock.patch("task_ai.app.handlers.helpers.client.beta.threads.messages.create")
+    # @mock.patch("task_ai.app.handlers.helpers.client.beta.threads.runs.create")   
     def test_handle_run_creation_valid(self):
         pass
 

@@ -36,8 +36,12 @@ def post_prompt_handler(request: HttpRequest):
 
     logger.info("Prompt: %s", prompt)
     logger.info("Prompt type: %s", p_type)
-    run_id = handle_run_creation(p_type, prompt)
-    periodically_check_run_status.delay(p_type, run_id)
+    try:
+        run_id = handle_run_creation(p_type, prompt)
+        periodically_check_run_status.delay(p_type, run_id)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.error("An error occurred: %s", e)
+        return JsonResponse(data={"error": str(e)}, status=500)
 
     return JsonResponse(data={"run_id": run_id})
 

@@ -60,12 +60,16 @@ def handle_run_creation(p_type: str, prompt: str) -> str:
     if thread_id is None or assistant_id is None:
         raise ValueError(f"Invalid prompt type: {p_type}")
 
-    client.beta.threads.messages.create(
-        thread_id=thread_id, role="user", content=prompt
-    )
+    try:
+        client.beta.threads.messages.create(
+            thread_id=thread_id, role="user", content=prompt
+        )
 
-    run = client.beta.threads.runs.create(
-        thread_id=thread_id, assistant_id=assistant_id
-    )
-
+        run = client.beta.threads.runs.create(
+            thread_id=thread_id, assistant_id=assistant_id
+        )
+    except Exception as e:
+        logger.error(e)
+        raise e
+    
     return run.id
