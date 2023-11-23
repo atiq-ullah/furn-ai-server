@@ -57,6 +57,7 @@ def validate_request(form: forms.Form) -> Optional[JsonResponse]:
 def handle_run_creation(p_type: str, prompt: str) -> str:
     thread_id = promptTypeMap.get(p_type)
     assistant_id = asstTypeMap.get(p_type)
+    
     if thread_id is None or assistant_id is None:
         raise ValueError(f"Invalid prompt type: {p_type}")
 
