@@ -1,11 +1,12 @@
 import logging
 from enum import Enum
 import os
+from typing import Optional
 from django import forms
 from django.http import JsonResponse
 from dotenv import load_dotenv
 from openai import OpenAI
-from typing import Optional
+
 
 
 load_dotenv()
@@ -51,8 +52,7 @@ client = OpenAI(api_key=API_KEY)
 def validate_request(form: forms.Form) -> Optional[JsonResponse]:
     if form.is_valid():
         return None
-    else:
-        return JsonResponse(form.errors, status=400)
+    return JsonResponse(form.errors, status=400)
 
 
 def handle_run_creation(p_type: str, prompt: str) -> str:

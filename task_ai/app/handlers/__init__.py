@@ -86,7 +86,5 @@ def periodically_check_run_status(p_type: str, run_id: str):
                 print(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
-            else:
-                print(f"Run status: {run.status}")
         except Exception as e:  # pylint: disable=broad-except
             logger.error("An error occurred: %s", e)

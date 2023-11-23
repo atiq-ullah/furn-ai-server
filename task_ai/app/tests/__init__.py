@@ -50,6 +50,7 @@ class HandlersTestCase(TestCase):
     def test_post_prompt_handler_exception(
         self, mock_celery_delay, mock_handle_run_creation, mock_validate_request
     ):
+        mock_celery_delay.return_value = None
         mock_validate_request.return_value = None
         mock_handle_run_creation.side_effect = ValueError("Test Exception")
 

@@ -17,7 +17,7 @@ class InputForm(forms.Form):
 
 
 class MockRun:
-    def __init__(self, id):
+    def __init__(self, id): # pylint: disable=redefined-builtin
         self.id = id
         self.status = "completed"
 
