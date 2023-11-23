@@ -45,7 +45,6 @@ class PromptView(APIView):
         return post_prompt_handler(request)
 
     def get(self, request: HttpRequest):
-
         return get_prompt_handler(request)
 
 

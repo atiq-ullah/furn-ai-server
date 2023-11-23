@@ -11,7 +11,7 @@ from .helpers import (
     validate_request,
     promptTypeMap,
     client,
-    handle_run_creation
+    handle_run_creation,
 )
 
 load_dotenv()
@@ -19,7 +19,6 @@ load_dotenv()
 app = Celery("handlers", broker="pyamqp://", backend="rpc://")
 
 logger = logging.getLogger(__name__)
-
 
 
 def post_prompt_handler(request: HttpRequest):
@@ -45,6 +44,7 @@ def post_prompt_handler(request: HttpRequest):
 
     return JsonResponse(data={"run_id": run_id})
 
+
 def get_prompt_handler(request: HttpRequest):
     form = MessageForm(request.GET)
     logger.info("Form: %s", form)
@@ -53,7 +53,7 @@ def get_prompt_handler(request: HttpRequest):
 
     if validation:
         return validation
-    
+
     p_type = form.cleaned_data["p_type"]
 
     if p_type not in promptTypeMap:
@@ -62,28 +62,28 @@ def get_prompt_handler(request: HttpRequest):
         )
 
     message_list = client.beta.threads.messages.list(
-        thread_id=promptTypeMap[p_type] # type: ignore
-    ).json() # type: ignore
+        thread_id=promptTypeMap[p_type]  # type: ignore
+    ).json()  # type: ignore
 
     return JsonResponse(data=message_list)
 
 
-@app.task(soft_time_limit=30) #type: ignore
+@app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
     while True:
         try:
             time.sleep(5)
             run = client.beta.threads.runs.retrieve(
-                run_id, thread_id=promptTypeMap[p_type] # type: ignore
+                run_id, thread_id=promptTypeMap[p_type]  # type: ignore
             )
 
             if run.status == "completed":
                 last_message = (
-                    client.beta.threads.messages.list(thread_id=promptTypeMap[p_type]) #type: ignore
+                    client.beta.threads.messages.list(thread_id=promptTypeMap[p_type])  # type: ignore
                     .data[0]
                     .content[0]
                 )
-                print(last_message.text.value) #type: ignore
+                print(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
             else:
