@@ -2,7 +2,7 @@ name: Unit tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 6-fix-unit-tests-for-handler-and-helpers ]
   pull_request:
     branches: [ main ]
 
