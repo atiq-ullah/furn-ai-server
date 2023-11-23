@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 
-
 load_dotenv()
 
 PARSING_ASST_ID = os.environ.get("OPENAI_PARSING_ASST_ID")

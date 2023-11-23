@@ -1,3 +1,4 @@
+import os
 import time
 import logging
 
@@ -13,13 +14,12 @@ from .helpers import (
     client,
     handle_run_creation,
 )
-import os
 
 load_dotenv()
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task_ai.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 
 app = Celery("handlers")
-app.config_from_object('django.conf:settings', namespace='CELERY')
+app.config_from_object("django.conf:settings", namespace="CELERY")
 
 
 logger = logging.getLogger(__name__)
