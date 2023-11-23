@@ -65,7 +65,7 @@ def get_prompt_handler(request: HttpRequest):
         thread_id=promptTypeMap[p_type] # type: ignore
     ).json() # type: ignore
 
-    return JsonResponse(data={"messages": message_list})
+    return JsonResponse(data=message_list)
 
 
 @app.task(soft_time_limit=30) #type: ignore
