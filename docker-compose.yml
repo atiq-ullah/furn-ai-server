@@ -2,34 +2,30 @@ version: '3.8'
 
 services:
   django:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/usr/src/app
+    image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
     ports:
       - "8000:8000"
     depends_on:
       - rabbitmq
     environment:
-      - DEBUG=True 
+      - DEBUG=True  # Set your environment variables here
+
+  celery:
+    image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
+    command: celery -A task_ai.app.handlers worker --loglevel=info
+    depends_on:
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
 
   rabbitmq:
-    image: rabbitmq:latest
+    image: rabbitmq:3-management
     ports:
       - "15672:15672"
       - "5672:5672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
-  celery:
-    build: .
-    command: celery -A task_ai.app.handlers worker --loglevel=info
-    volumes:
-      - .:/usr/src/app
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
-    depends_on:
-      - rabbitmq
-
 volumes:
   rabbitmq_data:
+
