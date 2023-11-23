@@ -44,6 +44,7 @@ class MessageForm(forms.Form):
         choices=[("parse", "Parse"), ("cat", "Cat")], required=True
     )
 
+
 client = OpenAI(api_key=API_KEY)
 
 
@@ -57,7 +58,7 @@ def validate_request(form: forms.Form) -> Optional[JsonResponse]:
 def handle_run_creation(p_type: str, prompt: str) -> str:
     thread_id = promptTypeMap.get(p_type)
     assistant_id = asstTypeMap.get(p_type)
-    
+
     if thread_id is None or assistant_id is None:
         raise ValueError(f"Invalid prompt type: {p_type}")
 
@@ -72,5 +73,5 @@ def handle_run_creation(p_type: str, prompt: str) -> str:
     except Exception as e:
         logger.error(e)
         raise e
-    
+
     return run.id
