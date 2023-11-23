@@ -1,7 +1,7 @@
+from unittest import mock
 from django import forms
 from django.test import TestCase, RequestFactory
 from django.http import JsonResponse
-from unittest import mock
 
 
 from task_ai.app.handlers.helpers import (

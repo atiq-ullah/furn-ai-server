@@ -1,7 +1,7 @@
 import json
+from unittest.mock import patch
 from django.test import TestCase, RequestFactory
 from django.http import JsonResponse
-from unittest.mock import patch, MagicMock
 from task_ai.app.handlers import post_prompt_handler, get_prompt_handler
 
 

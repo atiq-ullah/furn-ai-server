@@ -1,9 +1,9 @@
 import time
 import logging
-from django.http import JsonResponse
+
+from django.http import JsonResponse, HttpRequest
 from dotenv import load_dotenv
 from celery import Celery
-from django.http import HttpRequest
 
 from .helpers import (
     PromptForm,
