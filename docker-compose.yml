@@ -3,6 +3,7 @@ version: '3.8'
 services:
   django:
     image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
+    # build: .
     ports:
       - "8000:8000"
     depends_on:
@@ -14,6 +15,7 @@ services:
 
   celery:
     image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
+    # build: .
     command: celery -A task_ai.app.handlers worker --loglevel=info
     depends_on:
       - rabbitmq
