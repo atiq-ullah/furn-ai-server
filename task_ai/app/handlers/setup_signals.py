@@ -2,14 +2,19 @@ import pika
 
 
 class SignalConnection:
-    def __init__(self):
-        self.credentials = pika.PlainCredentials("guest", "guest")
-        self.queue_name = "prompt"
+    def __init__(self, p_type):
+        if (p_type == 'parse'):
+            self.credentials = pika.PlainCredentials("guest", "guest")
+            self.queue_name = "prompt_parse"
+            self.routing_key = "request.parse"
+        else:
+            self.credentials = pika.PlainCredentials("guest", "guest")
+            self.queue_name = "prompt_cat"
+            self.routing_key = "response.cat"
+
         self.exchange_name = "prompt"
-        self.routing_key = "prompt"
         self.connection_address = "rabbitmq"
         self.connection_port = 5672
-
         self.connection = self.connect_to_rabbitmq()
         print(f"Connected to RabbitMQ: {self.connection}")
         self.channel = self.connection.channel()
@@ -83,7 +88,7 @@ class SignalConnection:
 
 
 if __name__ == "__main__":
-    conn = SignalConnection()
+    conn = SignalConnection('parse')
     conn.create_exchange()
     conn.create_queue()
     conn.bind_queue_to_exchange()

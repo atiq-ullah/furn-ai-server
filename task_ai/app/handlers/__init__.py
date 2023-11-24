@@ -78,10 +78,15 @@ def get_prompt_handler(request: HttpRequest):
 
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
-    conn = SignalConnection()
+    conn = SignalConnection('parse')
     conn.create_exchange()
     conn.create_queue()
     conn.bind_queue_to_exchange()
+
+    cat_conn = SignalConnection('cat')
+    cat_conn.create_exchange()
+    cat_conn.create_queue()
+    cat_conn.bind_queue_to_exchange()
     while True:
         try:
             time.sleep(5)
@@ -96,8 +101,10 @@ def periodically_check_run_status(p_type: str, run_id: str):
                     .content[0]
                 )
                 print(last_message.text.value)  # type: ignore
-
-                conn.publish_message(last_message.text.value)  # type: ignore
+                if (p_type == 'parse'):
+                    conn.publish_message(last_message.text.value)
+                else:
+                    cat_conn.publish_message(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
         except Exception as e:  # pylint: disable=broad-except
