@@ -20,7 +20,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-CELERY_BROKER_URL = "pyamqp://guest:guest@localhost:5672//"
+CELERY_BROKER_URL = "pyamqp://guest:guest@0.0.0.0:5672//"
 CELERY_RESULT_BACKEND = "rpc://"
 
 LOGGING = {

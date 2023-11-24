@@ -7,7 +7,7 @@ class SignalConnection:
         self.queue_name = "prompt"
         self.exchange_name = "prompt"
         self.routing_key = "prompt"
-        self.connection_address = "localhost"
+        self.connection_address = "rabbitmq"
         self.connection_port = 5672
 
         self.connection = self.connect_to_rabbitmq()
