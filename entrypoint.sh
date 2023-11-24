@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ python manage.py makemigrations app
 # Apply database migrations
 python manage.py migrate
 
