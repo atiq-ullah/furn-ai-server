@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import pika
 
 from django.http import JsonResponse, HttpRequest
 from dotenv import load_dotenv
@@ -15,11 +16,7 @@ from .helpers import (
     handle_run_creation,
 )
 
-from .setup_signals import (
-    SignalConnection
-)
-
-import pika
+from .setup_signals import SignalConnection
 
 
 
@@ -91,14 +88,13 @@ def periodically_check_run_status(p_type: str, run_id: str):
             )
 
             if run.status == "completed":
-
                 last_message = (
                     client.beta.threads.messages.list(thread_id=promptTypeMap[p_type])  # type: ignore
                     .data[0]
                     .content[0]
                 )
                 print(last_message.text.value)  # type: ignore
-                conn.publish_message(last_message.text.value) # type: ignore
+                conn.publish_message(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
         except Exception as e:  # pylint: disable=broad-except

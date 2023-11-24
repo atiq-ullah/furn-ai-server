@@ -3,14 +3,12 @@ import pika
 
 class SignalConnection:
     def __init__(self):
-
         self.credentials = pika.PlainCredentials("guest", "guest")
         self.queue_name = "process_prompts_queue"
         self.exchange_name = "process_prompts"
         self.routing_key = "process_prompts_routing_key"
         self.connection_address = "0.0.0.0"
         self.connection_port = 5672
-
 
         self.connection = self.connect_to_rabbitmq()
         print(f"Connected to RabbitMQ: {self.connection}")
@@ -41,7 +39,7 @@ class SignalConnection:
         try:
             self.channel.queue_declare(queue=self.queue_name)
             print(f"Created queue: {self.queue_name}")
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             print(f"Error creating queue: {e}")
 
     def bind_queue_to_exchange(self):
@@ -67,7 +65,7 @@ class SignalConnection:
             print(f"Error publishing message: {e}")
 
     def consume_message(self):
-        def callback(ch, method, properties, body): # pylint: disable=unused-argument
+        def callback(ch, method, properties, body):  # pylint: disable=unused-argument
             message = body.decode("utf-8")
             print(f"Received message: {message}")
             # Process the message here
