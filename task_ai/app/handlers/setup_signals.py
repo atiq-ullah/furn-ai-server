@@ -4,10 +4,10 @@ import pika
 class SignalConnection:
     def __init__(self):
         self.credentials = pika.PlainCredentials("guest", "guest")
-        self.queue_name = "process_prompts_queue"
-        self.exchange_name = "process_prompts"
-        self.routing_key = "process_prompts_routing_key"
-        self.connection_address = "0.0.0.0"
+        self.queue_name = "prompt"
+        self.exchange_name = "prompt"
+        self.routing_key = "prompt"
+        self.connection_address = "localhost"
         self.connection_port = 5672
 
         self.connection = self.connect_to_rabbitmq()
@@ -80,3 +80,13 @@ class SignalConnection:
             self.channel.start_consuming()
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error consuming messages: {e}")
+
+if __name__ == "__main__":
+    conn = SignalConnection()
+    conn.create_exchange()
+    conn.create_queue()
+    conn.bind_queue_to_exchange()
+    conn.publish_message("Hello World!")
+    conn.consume_message()
+
+

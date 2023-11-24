@@ -23,12 +23,11 @@ from .setup_signals import SignalConnection
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 
-app = Celery("handlers")
+app = Celery("handlers", broker_connection_retry_on_startup=True)
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 
 logger = logging.getLogger(__name__)
-conn = SignalConnection()
 
 
 def post_prompt_handler(request: HttpRequest):
@@ -80,6 +79,10 @@ def get_prompt_handler(request: HttpRequest):
 
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
+    conn = SignalConnection()
+    conn.create_exchange()
+    conn.create_queue()
+    conn.bind_queue_to_exchange()
     while True:
         try:
             time.sleep(5)
@@ -94,6 +97,8 @@ def periodically_check_run_status(p_type: str, run_id: str):
                     .content[0]
                 )
                 print(last_message.text.value)  # type: ignore
+
+
                 conn.publish_message(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
                 break
