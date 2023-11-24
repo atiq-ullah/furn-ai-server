@@ -81,6 +81,7 @@ class SignalConnection:
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error consuming messages: {e}")
 
+
 if __name__ == "__main__":
     conn = SignalConnection()
     conn.create_exchange()
@@ -88,5 +89,3 @@ if __name__ == "__main__":
     conn.bind_queue_to_exchange()
     conn.publish_message("Hello World!")
     conn.consume_message()
-
-

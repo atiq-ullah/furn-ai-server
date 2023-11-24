@@ -19,7 +19,6 @@ from .helpers import (
 from .setup_signals import SignalConnection
 
 
-
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 
@@ -97,7 +96,6 @@ def periodically_check_run_status(p_type: str, run_id: str):
                     .content[0]
                 )
                 print(last_message.text.value)  # type: ignore
-
 
                 conn.publish_message(last_message.text.value)  # type: ignore
                 # TODO: Signal another function here to send response on socket
