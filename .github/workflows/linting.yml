@@ -19,5 +19,8 @@ jobs:
         python -m pip install --upgrade pip
         make install
 
+    - name: Check formatting
+      run: make format-check
+
     - name: Run Pylint
       run: make lint
