@@ -2,21 +2,22 @@ version: '3.8'
 
 services:
   django:
-    image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
-    # build: .
+    # image: atiqullah/task_ai:latest
+    build: .
+    command: bash entrypoint.sh
     ports:
       - "8000:8000"
     depends_on:
       - rabbitmq
     environment:
-      - DEBUG=True  # Set your environment variables here
+      - DEBUG=True
     env_file:
       - .env
 
   celery:
-    image: atiqullah/task_ai:latest  # Replace with your Docker Hub image tag
-    # build: .
-    command: celery -A task_ai.app.handlers worker --loglevel=info
+    # image: atiqullah/task_ai:latest
+    build: .
+    command: bash celery_entrypoint.sh
     depends_on:
       - rabbitmq
     environment:
