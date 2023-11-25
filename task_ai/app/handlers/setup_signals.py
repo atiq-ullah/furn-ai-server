@@ -26,6 +26,7 @@ class SignalConnection:
             return connection
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error connecting to RabbitMQ: {e}")
+            return None
 
     def setup_channel(self, connection, exchange_name, queue_name, routing_key):
         try:
@@ -42,3 +43,4 @@ class SignalConnection:
             return self.channel
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error setting up channel: {e}")
+            return None
