@@ -91,12 +91,6 @@ def get_prompt_handler(request: HttpRequest):
 
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
-    # Create 2 channels for Parse and Categorize
-    # Create a connection to RabbitMQ
-    # conn = SignalConnection()
-    # established_conn = conn.connect_to_rabbitmq("guest", "guest")
-    # parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
-    # cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
     while True:
         try:
             time.sleep(2)
