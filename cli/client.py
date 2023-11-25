@@ -10,7 +10,7 @@ load_dotenv()
 console = Console()
 credentials = pika.PlainCredentials("guest", "guest")
 
-connection_address = "0.0.0.0"
+connection_address = "34.134.37.153"
 address = connection_address
 connection_port = 5672
 url = "http://" + address + ":8000/prompt"
