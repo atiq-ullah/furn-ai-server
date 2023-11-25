@@ -22,7 +22,7 @@ connection = pika.BlockingConnection(
 parse_channel = connection.channel()
 cat_channel = connection.channel()
 
-test_content = "Wash the dishes, go to the store, and take out the trash."
+test_content = ""
 
 
 def main():
