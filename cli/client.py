@@ -1,10 +1,8 @@
 from rich.console import Console
-from rich.markdown import Markdown
-from rich.prompt import Prompt
 import requests
 from requests.auth import HTTPBasicAuth
 import pika
-import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,6 +25,7 @@ cat_channel = connection.channel()
 
 test_content = "Wash the dishes, go to the store, and take out the trash."
 
+
 def main():
     console.print("\n[bold blue]Task AI[/bold blue]\n")
 
@@ -37,7 +36,10 @@ def main():
 
     console.print("Parsing...")
     # TODO: Error handling
-    response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
+    response = requests.post(
+        url, data=data, auth=HTTPBasicAuth(username, password), timeout=10
+    )
+    print(response.content)
 
     def cat_callback(ch, method, properties, body):  # pylint: disable=unused-argument
         message = body.decode("utf-8")
@@ -45,14 +47,19 @@ def main():
         parse_channel.stop_consuming()
         cat_channel.stop_consuming()
         return
-    
+
     def parse_callback(ch, method, properties, body):  # pylint: disable=unused-argument
         message = body.decode("utf-8")
         data = {"prompt": message, "p_type": "cat"}
         console.print("Categorizing...")
         # TODO: Error handling
-        response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
-        cat_channel.basic_consume(queue="prompt_cat", on_message_callback=cat_callback, auto_ack=True)
+        response = requests.post(
+            url, data=data, auth=HTTPBasicAuth(username, password), timeout=10
+        )
+        print(response.content)
+        cat_channel.basic_consume(
+            queue="prompt_cat", on_message_callback=cat_callback, auto_ack=True
+        )
         return
 
     parse_channel.basic_consume(
