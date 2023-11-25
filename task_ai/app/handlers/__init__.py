@@ -1,3 +1,4 @@
+from nis import cat
 import os
 import time
 import logging
@@ -17,6 +18,11 @@ from .helpers import (
 )
 
 from .setup_signals import SignalConnection
+
+
+
+
+
 
 
 load_dotenv()
@@ -78,15 +84,12 @@ def get_prompt_handler(request: HttpRequest):
 
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
-    conn = SignalConnection("parse")
-    conn.create_exchange()
-    conn.create_queue()
-    conn.bind_queue_to_exchange()
-
-    cat_conn = SignalConnection("cat")
-    cat_conn.create_exchange()
-    cat_conn.create_queue()
-    cat_conn.bind_queue_to_exchange()
+    # Create 2 channels for Parse and Categorize
+    # Create a connection to RabbitMQ
+    conn = SignalConnection()
+    established_conn = conn.connect_to_rabbitmq("guest", "guest")
+    parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
+    cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
     while True:
         try:
             time.sleep(5)
@@ -102,10 +105,17 @@ def periodically_check_run_status(p_type: str, run_id: str):
                 )
                 print(last_message.text.value)  # type: ignore
                 if p_type == "parse":
-                    conn.publish_message(last_message.text.value)
+                    parse_channel.basic_publish( # type: ignore
+                        exchange="prompt",
+                        routing_key="parse",
+                        body=last_message.text.value,  # type: ignore
+                    )
                 else:
-                    cat_conn.publish_message(last_message.text.value)  # type: ignore
-                # TODO: Signal another function here to send response on socket
+                    cat_channel.basic_publish( # type: ignore
+                        exchange="prompt",
+                        routing_key="cat",
+                        body=last_message.text.value,  # type: ignore
+                    )                # TODO: Signal another function here to send response on socket
                 break
         except Exception as e:  # pylint: disable=broad-except
             logger.error("An error occurred: %s", e)
