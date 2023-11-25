@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from json import load
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,8 +20,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
-
-CELERY_BROKER_URL = "amqp://guest:guest@rabbitmq:5672//"
+from dotenv import load_dotenv
+import os
+load_dotenv()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
+address = "localhost" if os.getenv("DEBUG") == 1 else "rabbitmq"
+CELERY_BROKER_URL = "amqp://guest:guest@" + address + ":5672//"
 CELERY_RESULT_BACKEND = "rpc://"
 
 LOGGING = {
@@ -52,7 +57,7 @@ LOGGING = {
 SECRET_KEY = "django-insecure-nh@+rk!cf-vr=*q%ftln*i2dhqcjk4(a(w#kn$unv7p+ajm339"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 

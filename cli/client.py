@@ -4,16 +4,23 @@ from rich.prompt import Prompt
 import requests
 from requests.auth import HTTPBasicAuth
 import pika
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+debug = 0
+address = "localhost" if debug == 1 else "0.0.0.0"
 
 console = Console()
 credentials = pika.PlainCredentials("guest", "guest")
-connection_address = "0.0.0.0"
+
+connection_address = address
 connection_port = 5672
-url = "http://0.0.0.0:8000/prompt"
+url = "http://" + address + ":8000/prompt"
 username = "admin"
 password = "password"
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(connection_address, connection_port, "/", credentials)
+    pika.ConnectionParameters(address, connection_port, "/", credentials)
 )
 parse_channel = connection.channel()
 cat_channel = connection.channel()
@@ -29,6 +36,7 @@ def main():
     data = {"prompt": test_content, "p_type": "parse"}
 
     console.print("Parsing...")
+    # TODO: Error handling
     response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
 
     def cat_callback(ch, method, properties, body):  # pylint: disable=unused-argument
@@ -40,9 +48,9 @@ def main():
     
     def parse_callback(ch, method, properties, body):  # pylint: disable=unused-argument
         message = body.decode("utf-8")
-        # print(f"\n\n{message}")
         data = {"prompt": message, "p_type": "cat"}
         console.print("Categorizing...")
+        # TODO: Error handling
         response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
         cat_channel.basic_consume(queue="prompt_cat", on_message_callback=cat_callback, auto_ack=True)
         return

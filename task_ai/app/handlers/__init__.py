@@ -19,7 +19,13 @@ from .helpers import (
 
 from .setup_signals import SignalConnection
 
+# TODO: env variable for Rabbitmq connection
+# TODO: env variable for timeout
 
+conn = SignalConnection()
+established_conn = conn.connect_to_rabbitmq("guest", "guest")
+parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
+cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
 
 
 
@@ -27,8 +33,10 @@ from .setup_signals import SignalConnection
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
+debug = os.getenv("DEBUG")
+address = "localhost" if debug == 1 else "rabbitmq"
 
-app = Celery("handlers", broker_connection_retry_on_startup=True)
+app = Celery("handlers", broker_connection_retry_on_startup=True, broker="amqp://guest:guest@" + address + ":5672//")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 
@@ -86,13 +94,13 @@ def get_prompt_handler(request: HttpRequest):
 def periodically_check_run_status(p_type: str, run_id: str):
     # Create 2 channels for Parse and Categorize
     # Create a connection to RabbitMQ
-    conn = SignalConnection()
-    established_conn = conn.connect_to_rabbitmq("guest", "guest")
-    parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
-    cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
+    # conn = SignalConnection()
+    # established_conn = conn.connect_to_rabbitmq("guest", "guest")
+    # parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
+    # cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
     while True:
         try:
-            time.sleep(5)
+            time.sleep(2)
             run = client.beta.threads.runs.retrieve(
                 run_id, thread_id=promptTypeMap[p_type]  # type: ignore
             )

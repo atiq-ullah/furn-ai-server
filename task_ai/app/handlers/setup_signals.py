@@ -1,12 +1,17 @@
 import pika
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+debug = os.getenv("DEBUG")
+address = "localhost" if debug == 1 else "rabbitmq"
 
 class SignalConnection:
     def __init__(self):
         self.channel = None
 
     def connect_to_rabbitmq(
-        self, username, password, connection_address="rabbitmq", connection_port=5672
+        self, username, password, connection_address=address, connection_port=5672
     ):
         credentials = pika.PlainCredentials(username, password)
         try:
