@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
-debug = os.getenv("DEBUG")
-address = "localhost" if debug == 1 else "rabbitmq"
+address = os.environ.get("IP")
+address = "localhost" if address is None else address
 
 
 class SignalConnection:

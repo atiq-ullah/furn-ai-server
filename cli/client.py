@@ -6,13 +6,12 @@ import pika
 from dotenv import load_dotenv
 
 load_dotenv()
-debug = 0
-address = "localhost" if debug == 1 else "0.0.0.0"
 
 console = Console()
 credentials = pika.PlainCredentials("guest", "guest")
 
-connection_address = address
+connection_address = "0.0.0.0"
+address = connection_address
 connection_port = 5672
 url = "http://" + address + ":8000/prompt"
 username = "admin"

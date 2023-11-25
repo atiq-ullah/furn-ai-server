@@ -26,7 +26,8 @@ REST_FRAMEWORK = {
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
-address = "localhost" if os.getenv("DEBUG") == 1 else "rabbitmq"
+address = os.environ.get("IP")
+address = "localhost" if address is None else address
 CELERY_BROKER_URL = "amqp://guest:guest@" + address + ":5672//"
 CELERY_RESULT_BACKEND = "rpc://"
 

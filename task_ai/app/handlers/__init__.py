@@ -28,8 +28,8 @@ cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat"
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
-debug = os.getenv("DEBUG")
-address = "localhost" if debug == 1 else "rabbitmq"
+address = os.environ.get("IP")
+address = "localhost" if address is None else address
 
 app = Celery(
     "handlers",
