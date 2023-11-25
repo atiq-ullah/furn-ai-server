@@ -3,7 +3,7 @@ import pika
 
 class SignalConnection:
     def __init__(self, p_type):
-        if (p_type == 'parse'):
+        if p_type == "parse":
             self.credentials = pika.PlainCredentials("guest", "guest")
             self.queue_name = "prompt_parse"
             self.routing_key = "request.parse"
@@ -88,7 +88,7 @@ class SignalConnection:
 
 
 if __name__ == "__main__":
-    conn = SignalConnection('parse')
+    conn = SignalConnection("parse")
     conn.create_exchange()
     conn.create_queue()
     conn.bind_queue_to_exchange()
