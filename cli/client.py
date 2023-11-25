@@ -22,23 +22,18 @@ def main():
         pika.ConnectionParameters(connection_address, connection_port, "/", credentials)
     )
 
-
     text = input("Enter text: ")
     console.print(text)
 
-
     # Your endpoint
-    url = 'http://0.0.0.0:8000/prompt'
+    url = "http://0.0.0.0:8000/prompt"
 
     # Basic Auth credentials
-    username = 'admin'
-    password = 'password'
+    username = "admin"
+    password = "password"
 
     # Data to be sent in x-www-form-urlencoded format
-    data = {
-        'prompt': text,
-        'p_type': 'parse'
-    }
+    data = {"prompt": text, "p_type": "parse"}
 
     # Make the POST request with basic authentication
     response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
@@ -48,17 +43,14 @@ def main():
     count = 0
     channel = connection.channel()
     channel_cat = connection.channel()
+
     def callback(ch, method, properties, body):  # pylint: disable=unused-argument
         message = body.decode("utf-8")
         print(f"PARSED message: \n{message}")
- 
-        data = {
-            'prompt': message,
-            'p_type': 'cat'
-        }
+
+        data = {"prompt": message, "p_type": "cat"}
         response = requests.post(url, data=data, auth=HTTPBasicAuth(username, password))
         console.print("CAT: ", response.text)
-
 
         channel_cat.basic_consume(
             queue="prompt_cat", on_message_callback=cat_callback, auto_ack=True
@@ -80,7 +72,7 @@ def main():
     # print(
     #     f"Waiting for messages in the queue {queue_name}. To exit, press Ctrl+C."
     # )
-   
+
     # Send HTTP request to my API
     # Wait for rabbitmq message
     # Send another request with the message
