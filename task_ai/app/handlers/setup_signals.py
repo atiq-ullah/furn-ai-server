@@ -1,10 +1,12 @@
+import os
 import pika
 from dotenv import load_dotenv
-import os
+
 
 load_dotenv()
 debug = os.getenv("DEBUG")
 address = "localhost" if debug == 1 else "rabbitmq"
+
 
 class SignalConnection:
     def __init__(self):
@@ -23,12 +25,14 @@ class SignalConnection:
             print(f"Connected to RabbitMQ: {connection}")
             return connection
         except Exception as e:  # pylint: disable=broad-except
-            print(f"Error connecting to RabbitMQ: {e}")
+            raise e
 
     def setup_channel(self, connection, exchange_name, queue_name, routing_key):
         try:
             self.channel = connection.channel()
-            self.channel.exchange_declare(exchange=exchange_name, exchange_type="direct")
+            self.channel.exchange_declare(
+                exchange=exchange_name, exchange_type="direct"
+            )
             self.channel.queue_declare(queue=queue_name)
             self.channel.queue_bind(
                 exchange=exchange_name,
@@ -37,4 +41,4 @@ class SignalConnection:
             )
             return self.channel
         except Exception as e:  # pylint: disable=broad-except
-            print(f"Error setting up RabbitMQ: {e}")
+            raise e

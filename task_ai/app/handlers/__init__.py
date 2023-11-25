@@ -1,8 +1,6 @@
-from nis import cat
 import os
 import time
 import logging
-import pika
 
 from django.http import JsonResponse, HttpRequest
 from dotenv import load_dotenv
@@ -28,15 +26,16 @@ parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "
 cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
 
 
-
-
-
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 debug = os.getenv("DEBUG")
 address = "localhost" if debug == 1 else "rabbitmq"
 
-app = Celery("handlers", broker_connection_retry_on_startup=True, broker="amqp://guest:guest@" + address + ":5672//")
+app = Celery(
+    "handlers",
+    broker_connection_retry_on_startup=True,
+    broker="amqp://guest:guest@" + address + ":5672//",
+)
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 
@@ -113,17 +112,17 @@ def periodically_check_run_status(p_type: str, run_id: str):
                 )
                 print(last_message.text.value)  # type: ignore
                 if p_type == "parse":
-                    parse_channel.basic_publish( # type: ignore
+                    parse_channel.basic_publish(  # type: ignore
                         exchange="prompt",
                         routing_key="parse",
                         body=last_message.text.value,  # type: ignore
                     )
                 else:
-                    cat_channel.basic_publish( # type: ignore
+                    cat_channel.basic_publish(  # type: ignore
                         exchange="prompt",
                         routing_key="cat",
                         body=last_message.text.value,  # type: ignore
-                    )                # TODO: Signal another function here to send response on socket
+                    )  # TODO: Signal another function here to send response on socket
                 break
         except Exception as e:  # pylint: disable=broad-except
             logger.error("An error occurred: %s", e)
