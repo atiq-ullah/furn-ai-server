@@ -22,16 +22,19 @@ from .setup_signals import SignalConnection
 # TODO: env variable for timeout
 
 conn = SignalConnection()
+# TODO: Better credentials here
 established_conn = conn.connect_to_rabbitmq("guest", "guest")
+# TODO: Use a single queue here with different routing keys
 parse_channel = conn.setup_channel(established_conn, "prompt", "prompt_parse", "parse")
 cat_channel = conn.setup_channel(established_conn, "prompt", "prompt_cat", "cat")
 
-
+# TODO: Do I need to always load dotenv?
 load_dotenv()
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
-address = os.environ.get("IP")
-address = "localhost" if address is None else address
 
+# TODO: There is a better place for these for sure
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
+address = os.environ.get("RABBITMQ_ADDRESS")
+address = "localhost" if address is None else address
 app = Celery(
     "handlers",
     broker_connection_retry_on_startup=True,
@@ -90,7 +93,7 @@ def get_prompt_handler(request: HttpRequest):
 
     return JsonResponse(data=message_list)
 
-
+# TODO: Move this to a different file
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
     while True:
