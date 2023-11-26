@@ -121,3 +121,4 @@ def periodically_check_run_status(p_type: str, run_id: str):
                 break
         except Exception as e:  # pylint: disable=broad-except
             logger.error("An error occurred: %s", e)
+            break
