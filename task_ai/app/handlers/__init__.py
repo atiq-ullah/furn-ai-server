@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+from tkinter import E
 
 from django.http import JsonResponse, HttpRequest
 from dotenv import load_dotenv
@@ -93,11 +94,17 @@ def get_prompt_handler(request: HttpRequest):
 @app.task(soft_time_limit=30)  # type: ignore
 def periodically_check_run_status(p_type: str, run_id: str):
     while True:
-        try:
-            time.sleep(2)
-            run = client.beta.threads.runs.retrieve(
-                run_id, thread_id=promptTypeMap[p_type]  # type: ignore
-            )
+
+            time.sleep(5)
+
+            try:
+                run = client.beta.threads.runs.retrieve(
+                    run_id, thread_id=promptTypeMap[p_type]  # type: ignore
+                )
+
+            except Exception as e:  # pylint: disable=broad-except
+                logger.error("Unable to retrieve run: %s", e)
+                return;
 
             if run.status == "completed":
                 last_message = (
@@ -105,20 +112,27 @@ def periodically_check_run_status(p_type: str, run_id: str):
                     .data[0]
                     .content[0]
                 )
-                print(last_message.text.value)  # type: ignore
+
                 if p_type == "parse":
-                    parse_channel.basic_publish(  # type: ignore
-                        exchange="prompt",
-                        routing_key="parse",
-                        body=last_message.text.value,  # type: ignore
-                    )
+                    try:
+                        parse_channel.basic_publish(  # type: ignore
+                            exchange="prompt",
+                            routing_key="parse",
+                            body=last_message.text.value,  # type: ignore
+                        )
+                        return;
+                    except Exception as e:  # pylint: disable=broad-except
+                        logger.error("Unable to send parse: %s", e)
+                        return;
+
                 else:
-                    cat_channel.basic_publish(  # type: ignore
-                        exchange="prompt",
-                        routing_key="cat",
-                        body=last_message.text.value,  # type: ignore
-                    )  # TODO: Signal another function here to send response on socket
-                break
-        except Exception as e:  # pylint: disable=broad-except
-            logger.error("An error occurred: %s", e)
-            break
+                    try:
+                        cat_channel.basic_publish(  # type: ignore
+                            exchange="prompt",
+                            routing_key="cat",
+                            body=last_message.text.value,  # type: ignore
+                        )  # TODO: Signal another function here to send response on socket
+                        return;
+                    except Exception as e:  # pylint: disable=broad-except
+                        logger.error("Unable to send cat: %s", e)
+                        break
