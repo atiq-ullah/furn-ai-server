@@ -3,34 +3,28 @@ import pika
 from dotenv import load_dotenv
 
 
-load_dotenv()
-address = os.environ.get("IP")
-address = "localhost" if address is None else address
-
-
 class SignalConnection:
-    def __init__(self):
+    def __init__(self, username, password, connection_address="localhost", connection_port=5672):
+        self.connection = None
         self.channel = None
 
-    def connect_to_rabbitmq(
-        self, username, password, connection_address=address, connection_port=5672
-    ):
         credentials = pika.PlainCredentials(username, password)
         try:
-            connection = pika.BlockingConnection(
+            self.connection = pika.BlockingConnection(
                 pika.ConnectionParameters(
                     connection_address, connection_port, "/", credentials
                 )
             )
-            print(f"Connected to RabbitMQ: {connection}")
-            return connection
+            print(f"Connected to RabbitMQ: {self.connection}")
+            self.channel = self.connection.channel()
         except Exception as e:  # pylint: disable=broad-except
             print(f"Error connecting to RabbitMQ: {e}")
-            return None
+            raise e
 
-    def setup_channel(self, connection, exchange_name, queue_name, routing_key):
+    def setup_channel(self, exchange_name, queue_name, routing_key):
         try:
-            self.channel = connection.channel()
+            if self.channel is None:
+                return None
             self.channel.exchange_declare(
                 exchange=exchange_name, exchange_type="direct"
             )
