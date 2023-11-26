@@ -35,6 +35,7 @@ app = Celery(
     "handlers",
     broker_connection_retry_on_startup=True,
     broker="amqp://guest:guest@" + address + ":5672//",
+    broker_connection_retry=True,
 )
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
