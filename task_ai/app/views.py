@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework import permissions, viewsets
 
-from task_ai.openai_client.client import (
+from task_ai.openai_client import (
     PromptType,
     add_message_to_thread,
     get_message_list,
@@ -38,6 +38,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class PromptView(APIView):
     permission_classes = [permissions.IsAuthenticated]
