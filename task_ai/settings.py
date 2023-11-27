@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 # TODO: Extract all environment variables from .env file
 
 load_dotenv()

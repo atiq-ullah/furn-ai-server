@@ -32,45 +32,8 @@ class PromptType(Enum):
 logger = logging.getLogger(__name__)
 
 
-class PromptForm(forms.Form):
-    prompt = forms.CharField(required=True)
-    p_type = forms.ChoiceField(
-        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
-    )
-
-
-class MessageForm(forms.Form):
-    p_type = forms.ChoiceField(
-        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
-    )
 
 
 client = OpenAI(api_key=API_KEY)
 
 
-def validate_request(form: forms.Form) -> Optional[JsonResponse]:
-    if form.is_valid():
-        return None
-    return JsonResponse(form.errors, status=400)
-
-
-def handle_run_creation(p_type: str, prompt: str) -> str:
-    thread_id = promptTypeMap.get(p_type)
-    assistant_id = asstTypeMap.get(p_type)
-
-    if thread_id is None or assistant_id is None:
-        raise ValueError(f"Invalid prompt type: {p_type}")
-
-    try:
-        client.beta.threads.messages.create(
-            thread_id=thread_id, role="user", content=prompt
-        )
-
-        run = client.beta.threads.runs.create(
-            thread_id=thread_id, assistant_id=assistant_id
-        )
-    except Exception as e:
-        logger.error(e)
-        raise e
-
-    return run.id

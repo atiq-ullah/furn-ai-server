@@ -2,19 +2,18 @@ import os
 import time
 import logging
 from tkinter import E
+from task_ai.app.openai_client import (
+    get_last_message,
+    get_message_list,
+    add_message_to_thread,
+    start_run_on_thread,
+    get_run_status,
+)
 
 from django.http import JsonResponse, HttpRequest
 from dotenv import load_dotenv
 from celery import Celery
 
-from .helpers import (
-    PromptForm,
-    MessageForm,
-    validate_request,
-    promptTypeMap,
-    client,
-    handle_run_creation,
-)
 
 from .setup_signals import SignalConnection
 
@@ -61,12 +60,10 @@ def post_prompt_handler(request: HttpRequest):
 
     logger.info("Prompt: %s", prompt)
     logger.info("Prompt type: %s", p_type)
-    try:
-        run_id = handle_run_creation(p_type, prompt)
-        periodically_check_run_status.delay(p_type, run_id)
-    except Exception as e:  # pylint: disable=broad-except
-        logger.error("An error occurred: %s", e)
-        return JsonResponse(data={"error": str(e)}, status=500)
+    
+    message_return = add_message()
+    run_id = start_run()
+    periodically_check_run_status()
 
     return JsonResponse(data={"run_id": run_id})
 

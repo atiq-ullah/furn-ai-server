@@ -2,6 +2,7 @@ from os import environ
 from dotenv import load_dotenv
 from openai import OpenAI
 from enum import Enum
+
 load_dotenv()
 
 # OpenAI
@@ -18,10 +19,12 @@ client = OpenAI(api_key=API_KEY)
 
 promptTypeMap = {"parse": PARSING_THREAD_ID, "cat": CAT_THREAD_ID}
 asstTypeMap = {"parse": PARSING_ASST_ID, "cat": CAT_ASST_ID}
+
+
 class PromptType(Enum):
     PARSE = "parse"
     CAT = "cat"
 
+
 def get_ids():
     return PARSING_ASST_ID, PARSING_THREAD_ID, CAT_ASST_ID, CAT_THREAD_ID
-    
