@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from task_ai.app.models import (
     Task,
-    Instruction,
     CustomUser,
 )
 
@@ -22,9 +21,3 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Task
         fields = ["url", "user", "title", "description", "completed"]
-
-
-class InstructionSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Instruction
-        fields = ["url", "content", "created_at", "instruction_type"]

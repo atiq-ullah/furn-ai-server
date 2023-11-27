@@ -4,7 +4,7 @@ from typing import Optional
 import logging
 from openai import OpenAI
 from django.forms import CharField, ChoiceField, Form
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 
 from dotenv import load_dotenv
 
@@ -28,25 +28,33 @@ logger = logging.getLogger(__name__)
 type_to_thread_id = {"parse": PARSING_THREAD_ID, "cat": CAT_THREAD_ID}
 type_to_assistant_id = {"parse": PARSING_ASST_ID, "cat": CAT_ASST_ID}
 
+
 class PromptForm(Form):
     prompt = CharField(required=True)
-    p_type = ChoiceField(
-        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
-    )
+    p_type = ChoiceField(choices=[("parse", "Parse"), ("cat", "Cat")], required=True)
+
 
 class MessageForm(Form):
-    p_type = ChoiceField(
-        choices=[("parse", "Parse"), ("cat", "Cat")], required=True
-    )
+    p_type = ChoiceField(choices=[("parse", "Parse"), ("cat", "Cat")], required=True)
+
 
 class PromptType(Enum):
     PARSE = "parse"
     CAT = "cat"
 
-def validate_request(form: Form) -> Optional[JsonResponse]:
-    if form.is_valid():
-        return None
-    return JsonResponse(form.errors, status=400)
+
+def validate_request(request: HttpRequest) -> Optional[JsonResponse]:
+    form = None
+    if request.method == "POST":
+        form = PromptForm(request.POST)
+    elif request.method == "GET":
+        form = MessageForm(request.GET)
+    
+    if form is not None:
+        if form.is_valid():
+            return None
+        return JsonResponse(form.errors, status=400)
+
 
 def get_last_message(p_type: PromptType) -> str:
     logger.info("Retrieving last message from thread: %s", p_type.value)
@@ -62,6 +70,7 @@ def get_last_message(p_type: PromptType) -> str:
         return last_message.content[0].text.value
     return ""
 
+
 def get_message_list(p_type: PromptType) -> str:
     logger.info("Retrieving messages from thread: %s", p_type.value)
     try:
@@ -72,6 +81,7 @@ def get_message_list(p_type: PromptType) -> str:
         logger.error("Could not retrieve messages from thread: %s", e)
         raise e
     return message_list.model_dump_json()
+
 
 def add_message_to_thread(p_type: PromptType, message: str) -> str:
     logger.info("Adding messages: %s to thread: %s", message, p_type.value)
@@ -85,6 +95,7 @@ def add_message_to_thread(p_type: PromptType, message: str) -> str:
         raise e
     return thread_message.id
 
+
 def start_run_on_thread(p_type: PromptType) -> str:
     logger.info("Starting run on thread: %s", p_type.value)
     thread_id = type_to_thread_id[p_type.value]
@@ -97,6 +108,7 @@ def start_run_on_thread(p_type: PromptType) -> str:
         logger.error("Could not start run on thread: %s", e)
         raise e
     return run.id
+
 
 def get_run_status(p_type: PromptType, run_id: str):
     try:
