@@ -17,5 +17,5 @@ def monitor_run_status(self, p_type, run_id):
 
 
 @app.task(bind=True)
-def handle_response(self, p_type, message):
+def handle_response(self, p_type, message): # pylint: disable=unused-argument
     print("Message in handle response: \n" + message)
