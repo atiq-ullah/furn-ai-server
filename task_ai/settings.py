@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 # TODO: Extract all environment variables from .env file
 
 load_dotenv()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 address = os.environ.get("RABBITMQ_ADDRESS")
 address = "localhost" if address is None else address
-CELERY_BROKER_URL = "amqp://guest:guest@" + address + ":5672//"
+# CELERY_BROKER_URL = "amqp://guest:guest@" + address + ":5672//"
 CELERY_RESULT_BACKEND = "rpc://"
 # TODO: These should be in env file
 GCP_ADDRESS = os.environ.get("GCP_ADDRESS")
@@ -50,6 +51,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_yasg",
+    "task_ai.openai_client",
+    "task_ai.celery",
+    "task_ai.signals",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
