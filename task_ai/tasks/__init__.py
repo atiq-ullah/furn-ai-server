@@ -24,8 +24,9 @@ def monitor_run_status(self, p_type, run_id):
 @app.task(bind=True)
 def handle_response(self, p_type, message):  # pylint: disable=unused-argument
     print("Message in handle response: \n" + message)
-    signal_conn = SignalConnection()
-    conn = signal_conn.connect("guest", "guest")
-    channel = signal_conn.setup_channel(conn, "openai", "openai", "openai")
+    signal_conn = SignalConnection("guest", "guest")
+    channel = signal_conn.setup_channel("openai", "openai", "openai")
+    if channel is None:
+        return None
     channel.basic_publish(exchange="openai", routing_key="openai", body=message)
     return message
