@@ -16,8 +16,6 @@ SchemaView = get_schema_view(
 )
 
 router = routers.DefaultRouter()
-router.register(r"users", views.UserViewSet)
-router.register(r"tasks", views.TaskViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
