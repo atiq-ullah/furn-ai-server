@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import permissions, viewsets
 
@@ -63,3 +64,6 @@ class PromptView(APIView):
         if p_type is not None:
             return HttpResponse(get_message_list(p_type))
         return JsonResponse({"error": "Invalid p_type"}, status=400)
+
+def index(request):
+    return render(request, 'index.html')

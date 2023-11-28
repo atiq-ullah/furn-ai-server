@@ -18,6 +18,7 @@ SchemaView = get_schema_view(
 router = routers.DefaultRouter()
 
 urlpatterns = [
+    path("home/", views.index),
     path("", include(router.urls)),
     path("admin", admin.site.urls),
     path("prompt", views.PromptView.as_view(), name="prompt"),
