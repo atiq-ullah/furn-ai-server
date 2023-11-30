@@ -3,7 +3,7 @@ import os
 from celery import Celery
 from task_ai.signals import MQ_ADDRESS, MQ_PORT
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'task_ai.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
 
 
 MQ_ADDRESS = os.environ.get("MQ_ADDRESS", "localhost")
