@@ -6,6 +6,10 @@ RabbitMQ is used as the Celery backend, when Django gets a prompt request it sen
 
 ## Getting Started
 
+### Docker Compose
+
+To get started right away there is a `/docker/docker-compose.yml` file that will start a `rabbitmq` container as well as containers for Django and the Celery worker.
+
 ### Makefile
 
 The included Makefile at the root of the repo contains several useful tasks to run during development and that are used in the Github Actions to check things before they are added to the main branch.
