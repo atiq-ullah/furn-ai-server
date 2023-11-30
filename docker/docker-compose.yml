@@ -2,25 +2,22 @@ version: '3.8'
 
 services:
   django:
-    # image: atiqullah/task_ai:latest
-    build: .
-    command: bash entrypoint.sh
+    image: atiqullah/task_ai:latest
+    command: bash docker/entrypoints/django.sh
     ports:
       - "8000:8000"
     depends_on:
       - rabbitmq
     env_file:
-      - .env
+      - ../.env
 
   celery:
-    # image: atiqullah/task_ai:latest
-    build: .
-    command: bash celery_entrypoint.sh
+    image: atiqullah/task_ai:latest
+    command: bash docker/entrypoints/celery.sh
     depends_on:
       - rabbitmq
     env_file:
-      - .env
-
+      - ../.env
 
   rabbitmq:
     image: rabbitmq:3-management

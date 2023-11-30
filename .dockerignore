@@ -1,0 +1,9 @@
+db.sqlite3
+Makefile
+instructions/
+docker/
+!docker/entrypoints/
+env/
+.*
+*.md
+__pycache__/
