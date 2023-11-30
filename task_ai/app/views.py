@@ -65,5 +65,6 @@ class PromptView(APIView):
             return HttpResponse(get_message_list(p_type))
         return JsonResponse({"error": "Invalid p_type"}, status=400)
 
+
 def index(request):
-    return render(request, 'index.html')
+    return render(request, "index.html")

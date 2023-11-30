@@ -5,7 +5,6 @@ import logging
 from openai import OpenAI
 from django.forms import CharField, ChoiceField, Form
 from django.http import HttpRequest, JsonResponse
-
 from dotenv import load_dotenv
 
 load_dotenv()

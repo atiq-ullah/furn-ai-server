@@ -1,18 +1,10 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
-# TODO: Extract all environment variables from .env file
-
-load_dotenv()
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "task_ai.settings")
-address = os.environ.get("RABBITMQ_ADDRESS")
-address = "localhost" if address is None else address
-# CELERY_BROKER_URL = "amqp://guest:guest@" + address + ":5672//"
+address = os.environ.get("MQ_ADDRESS", "localhost")
 CELERY_RESULT_BACKEND = "rpc://"
-# TODO: These should be in env file
-GCP_ADDRESS = os.environ.get("GCP_ADDRESS")
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", GCP_ADDRESS]
+
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -40,7 +32,6 @@ REST_FRAMEWORK = {
 }
 SECRET_KEY = "django-insecure-nh@+rk!cf-vr=*q%ftln*i2dhqcjk4(a(w#kn$unv7p+ajm339"
 DEBUG = True
-# TODO: Review these apps
 INSTALLED_APPS = [
     "task_ai.app",
     "django.contrib.admin",
@@ -65,7 +56,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 ROOT_URLCONF = "task_ai.urls"
-# TODO: Do I need this?
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -82,8 +72,6 @@ TEMPLATES = [
     },
 ]
 WSGI_APPLICATION = "task_ai.wsgi.application"
-# Database
-# TODO: Update this to use postgres
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

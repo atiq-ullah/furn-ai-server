@@ -1,42 +1,28 @@
 import os
-import pika
-from dotenv import load_dotenv
+from pika import PlainCredentials, ConnectionParameters, BlockingConnection
+
+MQ_USERNAME = os.environ.get("MQ_USERNAME", "guest")
+MQ_PASSWORD = os.environ.get("MQ_PASSWORD", "guest")
+MQ_ADDRESS = os.environ.get("MQ_ADDRESS", "localhost")
+MQ_PORT = os.environ.get("MQ_PORT", 5672)
 
 
-class SignalConnection:
-    def __init__(
-        self, username, password, connection_address="localhost", connection_port=5672
-    ):
-        self.connection = None
-        self.channel = None
+def setup_mq_connections(exchange_name, queue_name, routing_key):
+    try:
+        credentials = PlainCredentials(MQ_USERNAME, MQ_PASSWORD)
+        connection_params = ConnectionParameters(MQ_ADDRESS, MQ_PORT, "/", credentials)
+        connection = BlockingConnection(connection_params)
+        channel = connection.channel()
+        print(f"Connected to RabbitMQ: {connection}")
 
-        credentials = pika.PlainCredentials(username, password)
-        try:
-            self.connection = pika.BlockingConnection(
-                pika.ConnectionParameters(
-                    connection_address, connection_port, "/", credentials
-                )
-            )
-            print(f"Connected to RabbitMQ: {self.connection}")
-            self.channel = self.connection.channel()
-        except Exception as e:  # pylint: disable=broad-except
-            print(f"Error connecting to RabbitMQ: {e}")
-            raise e
-
-    def setup_channel(self, exchange_name, queue_name, routing_key):
-        try:
-            if self.channel is None:
-                return None
-            self.channel.exchange_declare(
-                exchange=exchange_name, exchange_type="direct"
-            )
-            self.channel.queue_declare(queue=queue_name)
-            self.channel.queue_bind(
-                exchange=exchange_name,
-                queue=queue_name,
-                routing_key=routing_key,
-            )
-            return self.channel
-        except Exception as e:  # pylint: disable=broad-except
-            print(f"Error setting up channel: {e}")
-            return None
+        channel.exchange_declare(exchange=exchange_name, exchange_type="direct")
+        channel.queue_declare(queue=queue_name)
+        channel.queue_bind(
+            exchange=exchange_name,
+            queue=queue_name,
+            routing_key=routing_key,
+        )
+        return channel
+    except Exception as e:
+        print(f"Error connecting to RabbitMQ: {e}")
+        raise e
