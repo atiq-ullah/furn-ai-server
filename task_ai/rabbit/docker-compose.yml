@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  python:
+    image: python:3.12.0-alpine3.18  # Use the Python version you need
+    volumes:
+      - .:/usr/src/app  # Mounts the current directory to /usr/src/app in the container
+    working_dir: /usr/src/app  # Sets the working directory in the container
+    command: sh -c "while true; do sleep 30; done"  # Keeps the container running with a shell
+
