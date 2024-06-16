@@ -32,3 +32,8 @@ The included Makefile at the root of the repo contains several useful tasks to r
 
 #### Stage 5: Feedback Loop and AI Learning
   - **User Interaction:** Implement feedback mechanisms to refine AI accuracy and relevance over time.
+### Infrastructure model
+![Infrastructure main model](.infragenie/infrastructure_main_model.svg)
+- [django component model](.infragenie/django_component_model.svg)
+
+---
